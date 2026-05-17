@@ -1,6 +1,8 @@
 # from django.shortcuts import render
 # from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.db.models import Avg
 from rest_framework import status
 from django.http import Http404
 from rest_framework import generics, viewsets ,mixins
@@ -22,6 +24,28 @@ class ProductModelViewSet(viewsets.ModelViewSet):
             ismany = isinstance(kwargs["data"], list)
             kwargs["many"] = ismany
         return super().get_serializer(*args, **kwargs)
+    
+    # detail stands for detail view, basically a pk is mandatorily passed, therefore only for single products.
+    # we are not updating the data, just retrieving for mathematical calc, therefore method is get.
+    @action(detail=True, methods=['get'])
+    def status(self, request, pk=None):
+        product = self.get_object()
+
+        aggregation_dict = product.reviews.aggregate(Avg('rating'))
+        avg_rating = aggregation_dict['rating__avg']
+        if avg_rating is None:
+            status_label = "Unrated"
+        elif float(avg_rating) > 3.0:
+            status_label = "Good Product"
+        else:
+            status_label = "Bad Product"
+
+        return Response({
+            'product': product.name,
+            'average rating': round(avg_rating, 2) if avg_rating else None,
+            'status': status_label
+        })  
+
 #Review
 class ReviewModelViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()

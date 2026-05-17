@@ -37,7 +37,8 @@ review_detail = ReviewModelViewSet.as_view({
     path('reviews/<int:pk>/', review_detail, name='review-detail'),
 '''
 
-router = routers.SimpleRouter()
+# router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 router.register(r'products', ProductModelViewSet)
 router.register(r'reviews', ReviewModelViewSet)
 

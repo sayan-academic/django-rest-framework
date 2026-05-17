@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import Product, Review
 
-class ReviewSerializer(serializers.ModelSerializer):
+#using HyperlinkedModelSerializer instead of ModelSerializer to use with Routers.
+class ReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model=Review
-        fields = ['id', 'rating', 'content', 'product', 'created_at']
+        fields = ['url', 'id', 'rating', 'content', 'product', 'created_at']
 
-    # object level validation
+    # object level validation   
     def validate(self, data):
         rating = data.get('rating')
         content = data.get('content')
@@ -17,11 +18,13 @@ class ReviewSerializer(serializers.ModelSerializer):
             })
         return data
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.HyperlinkedModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
+
+    status_url = serializers.HyperlinkedIdentityField(view_name='product-status')
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'reviews']
+        fields = ['url', 'id', 'name', 'description', 'price', 'status_url', 'reviews']
     # used validator in model Product
 
 '''
