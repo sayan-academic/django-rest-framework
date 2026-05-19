@@ -19,14 +19,26 @@ class ReviewSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
 class ProductSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
     reviews = ReviewSerializer(many=True, read_only=True)
 
     status_url = serializers.HyperlinkedIdentityField(view_name='product-status')
     class Meta:
         model = Product
-        fields = ['url', 'id', 'name', 'description', 'price', 'status_url', 'reviews']
+        fields = ['url', 'id', 'owner', 'name', 'description', 'price', 'status_url', 'reviews']
+        read_only_fields = ['owner']
     # used validator in model Product
+    def validate(self, data):
+        price = data.get('price')
 
+        if price <= 0:
+            raise serializers.ValidationError({
+                'price' : 'price has to be positive.'
+            })
+        return data
+    
 '''
 class ReviewSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)   
