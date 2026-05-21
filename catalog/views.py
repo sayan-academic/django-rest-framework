@@ -6,16 +6,40 @@ from django.db.models import Avg
 from rest_framework import status
 from django.http import Http404
 from rest_framework import generics, viewsets ,mixins
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+
+# token authentication
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 from .models import Product, Review
 from .serializers import ProductSerializer, ReviewSerializer
 
 # Create your views here.
 
+# Token auth view
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+
+        serializer.is_valid(raise_exception=True)
+        
+        user = serializer.validated_data['user']
+        
+        token, created = Token.objects.get_or_create(user=user)
+        
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'username': user.username
+        })
+    
 # Phase 5 code, ModelViewSet--epitome of DRY and simplicity.
 # ReadOnlyModelViewSet exists for read only endpoints, it provides list and retrieve actions.
 #Product
 class ProductModelViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication, 
+                              SessionAuthentication, BasicAuthentication]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -48,6 +72,8 @@ class ProductModelViewSet(viewsets.ModelViewSet):
 
 #Review
 class ReviewModelViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication, 
+                              SessionAuthentication, BasicAuthentication]
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     

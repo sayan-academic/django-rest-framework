@@ -1,6 +1,6 @@
 from django.urls import path, include
 # from .views import ProductGetPostGenericAPIview, ProductGetPutDeleteGenericAPIview, ReviewGetPostGenericAPIview, ReviewGetPutDeleteGenericAPIview
-from .views import ProductModelViewSet, ReviewModelViewSet
+from .views import ProductModelViewSet, ReviewModelViewSet, CustomAuthToken
 from rest_framework import routers
 
 
@@ -43,6 +43,7 @@ router.register(r'products', ProductModelViewSet)
 router.register(r'reviews', ReviewModelViewSet)
 
 urlpatterns = [
-   
+    path('', include(router.urls)),
+    path('login/', CustomAuthToken.as_view(), name='api_login'),
 ]
-urlpatterns += router.urls
+# urlpatterns += router.urls
