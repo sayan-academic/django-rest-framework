@@ -19,7 +19,8 @@ class Product(models.Model):
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, 
                                 related_name='reviews')
-
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, 
+                              related_name='reviews', blank=True, null=True)
     class RatingChoices(models.IntegerChoices):
         STAR_1 = 1, "1 Star"
         STAR_2 = 2, "2 Star"
@@ -30,5 +31,5 @@ class Review(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-
-    
+    def __str__(self):
+        return f"{self.owner.username if self.owner else 'Anonymous'} - {self.product.name} ({self.rating} stars)"

@@ -1,6 +1,7 @@
 from django.urls import path, include
 # from .views import ProductGetPostGenericAPIview, ProductGetPutDeleteGenericAPIview, ReviewGetPostGenericAPIview, ReviewGetPutDeleteGenericAPIview
-from .views import ProductModelViewSet, ReviewModelViewSet, CustomAuthToken
+from .views import ProductModelViewSet, ReviewModelViewSet
+from .authentications import CustomAuthToken
 from rest_framework import routers
 
 

@@ -3,9 +3,13 @@ from .models import Product, Review
 
 #using HyperlinkedModelSerializer instead of ModelSerializer to use with Routers.
 class ReviewSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
     class Meta:
         model=Review
-        fields = ['url', 'id', 'rating', 'content', 'product', 'created_at']
+        fields = ['url', 'id', 'owner', 'rating', 'content', 'product', 'created_at']
+        read_only_fields = ['owner']
 
     # object level validation   
     def validate(self, data):
