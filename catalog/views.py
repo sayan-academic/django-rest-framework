@@ -28,10 +28,14 @@ class ProductModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if not user.is_authenticated:
-            return Product.objects.none()
+
+        if self.action in ['list', 'retrieve']:
+            return Product.objects.all()
         
-        return Product.objects.filter(owner=user)
+        if not user.is_authenticated:
+            return Product.objects.filter(owner=user)
+        
+        return Product.objects.none()
     
     serializer_class = ProductSerializer
 
@@ -67,7 +71,19 @@ class ReviewModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedAndOwner]
     authentication_classes = [TokenAuthentication, 
                               SessionAuthentication, BasicAuthentication]
-    queryset = Review.objects.all()
+    
+    # queryset = Review.objects.all()
+    def get_queryset(self):
+        user = self.request.user
+
+        if self.action in ['list', 'retrieve']:
+            return Review.objects.all()
+        
+        if not user.is_authenticated:
+            return Review.objects.filter(owner=user)
+        
+        return Review.objects.none()
+    
     serializer_class = ReviewSerializer
     
     def get_serializer(self, *args, **kwargs):

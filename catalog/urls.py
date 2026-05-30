@@ -40,8 +40,8 @@ review_detail = ReviewModelViewSet.as_view({
 
 # router = routers.SimpleRouter()
 router = routers.DefaultRouter()
-router.register(r'products', ProductModelViewSet)
-router.register(r'reviews', ReviewModelViewSet)
+router.register(r'products', ProductModelViewSet, basename='product')
+router.register(r'reviews', ReviewModelViewSet, basename='review')
 
 urlpatterns = [
     path('', include(router.urls)),
